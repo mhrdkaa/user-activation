@@ -1,41 +1,69 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Clipboard iframe divergence test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Click Clipboard Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #statusOutput {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f4f4f4;
+            border-radius: 5px;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+    </style>
 </head>
-
 <body>
-
-    <h3>TOP PAGE</h3>
-
-    <iframe srcdoc='
-    <button id="btn">CLICK</button>
-    <div id="out"></div>
-
+    <button id="triggerBtn" style="display: none;">CLICK ME</button>
+    <div id="statusOutput">
+        <strong>Activity Log:</strong><br>
+    </div>
     <script>
-      const btn = document.getElementById("btn");
-      const out = document.getElementById("out");
+    const btn = document.getElementById("triggerBtn");
+    const output = document.getElementById("statusOutput");
 
-      btn.onclick = async () => {
-        out.innerText = "clicked";
+    function printToScreen(message) {
+        let span = document.createElement("span");
+        span.innerHTML = "> " + message + "<br>";
+        output.appendChild(span);
+    }
 
-        const ua = navigator.userActivation && navigator.userActivation.isActive;
+    btn.addEventListener("click", async (event) => {
+        printToScreen("Executing click event...");
+        printToScreen(`Is this click trusted (from human)? ${event.isTrusted}`);
+        printToScreen("---------------------------------");
 
         try {
-          await navigator.clipboard.writeText("TEST-123");
-
-          out.innerText =
-            "CLIPBOARD SUCCESS | userActivation=" + ua;
+            printToScreen("Attempting to WRITE to clipboard...");
+            await navigator.clipboard.writeText("TEST-123");
+            printToScreen("WRITE SUCCESS: Text successfully copied to clipboard!");
         } catch (e) {
-          out.innerText =
-            "CLIPBOARD BLOCKED | userActivation=" + ua;
+            printToScreen(`WRITE BLOCKED: Browser denied access. (${e.message})`);
         }
-      };
-    <\/script>
-  ' sandbox="allow-scripts" style="width:100%; height:200px; border:1px solid black;">
-    </iframe>
 
+        printToScreen("---------------------------------");
+
+        try {
+            printToScreen("Attempting to READ from clipboard...");
+            const clipboardText = await navigator.clipboard.readText();
+            printToScreen(`READ SUCCESS: Clipboard content is "${clipboardText}"`);
+        } catch (e) {
+            printToScreen(`READ BLOCKED: Browser denied access. (${e.message})`);
+        }
+    });
+
+    window.onload = () => {
+        printToScreen("Page loaded. Waiting 2 seconds for auto-click...");
+        
+        setTimeout(() => {
+            printToScreen("Triggering automatic click on hidden button...");
+            btn.click(); 
+        }, 2000);
+    };
+    </script>
 </body>
-
 </html>
