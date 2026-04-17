@@ -7,16 +7,16 @@
 
 <body>
     <h3>Site A</h3>
-    <button onclick="startRedirect()">
+    <!-- <button onclick="startRedirect()">
         Click me then wait redirect
     </button>
-    <p id="status">Waiting...</p>
+    <p id="status">Waiting...</p> -->
     <iframe
-        id="frame"
+        src="https://user-activation.vercel.app/site-b.html"
         sandbox="allow-scripts"
         style="width:100%; height:300px; border:1px solid #ccc; margin-top:10px;">
     </iframe>
-    <script>
+    <!-- <script>
         const status = document.getElementById("status");
         const frame = document.getElementById("frame");
         function startRedirect() {
@@ -25,7 +25,7 @@
                 frame.src = "https://user-activation.vercel.app/site-b.html";
             }, 2000);
         }
-    </script>
+    </script> -->
 
 </body>
 
