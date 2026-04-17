@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Click Clipboard Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #statusOutput {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f4f4f4;
+            border-radius: 5px;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+        .error { color: red; font-weight: bold; }
+        .success { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <button id="triggerBtn" style="display: none;">CLICK ME</button>
+    <div id="statusOutput">
+        <strong>Log Aktivitas:</strong><br>
+    </div>
+    <script>
+    const btn = document.getElementById("triggerBtn");
+    const output = document.getElementById("statusOutput");
+
+    function tulisKeLayar(pesan, tipe = "normal") {
+        let span = document.createElement("span");
+        if (tipe === "error") span.className = "error";
+        if (tipe === "success") span.className = "success";
+        
+        span.innerHTML = "> " + pesan + "<br>";
+        output.appendChild(span);
+    }
+    btn.addEventListener("click", async (event) => {
+        tulisKeLayar("Mengeksekusi event klik...");
+        tulisKeLayar(`Apakah klik ini dari manusia? ${event.isTrusted}`);
+
+        try {
+            await navigator.clipboard.writeText("TEST-123");
+            tulisKeLayar("SUCCESS: Teks berhasil di-copy ke clipboard!", "success");
+        } catch (e) {
+            tulisKeLayar(`BLOCKED: Browser menolak akses. (${e.message})`, "error");
+        }
+    });
+
+    window.onload = () => {
+        tulisKeLayar("Halaman selesai dimuat. Menunggu 2 detik untuk auto-click...");
+        
+        setTimeout(() => {
+            tulisKeLayar("Men-trigger klik otomatis pada tombol tersembunyi...");
+            btn.click(); 
+        }, 2000);
+    };
+    </script>
+
+</body>
+</html>
