@@ -1,68 +1,12 @@
-<!DOCTYPE html>
-<html>
+<button id="triggerBtn">CLICK</button>
 
-<head>
-    <title>PoC - Site B (Clipboard)</title>
-    <style>
-        body {
-            font-family: monospace;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: white;
-        }
-
-        #status {
-            margin-top: 20px;
-            color: #666;
-            font-weight: bold;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div id="status">Waiting...</div>
-    <button id="triggerBtn">CLICK TO RUN</button>
-
-    <script>
-        const btn = document.getElementById('triggerBtn');
-        const status = document.getElementById('status');
-
-        btn.addEventListener('click', async () => {
-
-            if (navigator.userActivation && navigator.userActivation.isActive) {
-                try {
-                    await navigator.clipboard.writeText("POC - UTAA");
-
-                    status.innerText = "RESULT: SUCCESS (Clipboard written)";
-                    status.style.color = "green";
-
-                    console.log("User activation valid: clipboard success");
-
-                } catch (err) {
-                    status.innerText = "RESULT: FAILED (Clipboard blocked)";
-                    status.style.color = "red";
-
-                    console.error(err);
-                }
-            } else {
-                status.innerText = "RESULT: EXPIRED (No user activation)";
-                status.style.color = "blue";
-            }
-        });
-    </script>
-
-</body>
-
-</html>
+<script>
+document.getElementById("triggerBtn").addEventListener("click", async () => {
+    try {
+        await navigator.clipboard.writeText("TEST-123");
+        console.log("SUCCESS");
+    } catch (e) {
+        console.log("BLOCKED", e);
+    }
+});
+</script>
