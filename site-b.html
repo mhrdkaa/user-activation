@@ -1,24 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="refresh" content="5">
-    <title>Inner iframe (Site B)</title>
+    <title>PoC - Site B (Clipboard)</title>
+    <style>
+        body {
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: white;
+        }
+
+        #timer {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        #status {
+            margin-top: 20px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    <h3>Inner iframe (Site B)</h3>
-    <div id="result">Checking user activation...</div>
+
+    <div id="timer">2s...</div>
+    <div id="status">Waiting...</div>
+
+    <button id="triggerBtn">CLICK TO RUN</button>
+
     <script>
         setTimeout(() => {
-            const result = document.getElementById("result");
+            document.getElementById('timer').innerText = "1s...";
+        }, 1000);
 
-            if (navigator.userActivation) {
-                result.innerHTML =
-                    "isActive: " + navigator.userActivation.isActive + "<br>" +
-                    "hasBeenActive: " + navigator.userActivation.hasBeenActive;
+        setTimeout(() => {
+            document.getElementById('timer').innerText = "LEPAS!";
+        }, 2000);
+
+        const status = document.getElementById('status');
+        const btn = document.getElementById('triggerBtn');
+
+        btn.addEventListener('click', async () => {
+
+            if (navigator.userActivation && navigator.userActivation.isActive) {
+                try {
+                    await navigator.clipboard.writeText("POC - UTAA");
+
+                    status.innerText = "RESULT: SUCCESS (Clipboard written)";
+                    status.style.color = "green";
+
+                    console.log("User activation valid: clipboard success");
+
+                } catch (err) {
+                    status.innerText = "RESULT: FAILED (Clipboard blocked)";
+                    status.style.color = "red";
+
+                    console.error(err);
+                }
             } else {
-                result.innerText = "userActivation not supported";
+                status.innerText = "RESULT: EXPIRED (No user activation)";
+                status.style.color = "blue";
             }
-        }, 1500);
+        });
     </script>
 
 </body>
