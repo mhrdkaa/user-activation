@@ -1,4 +1,4 @@
-<button id="triggerBtn">CLICK</button>
+<!-- <button id="triggerBtn">CLICK</button>
 
 <script>
 document.getElementById("triggerBtn").addEventListener("click", async () => {
@@ -9,4 +9,26 @@ document.getElementById("triggerBtn").addEventListener("click", async () => {
         console.log("BLOCKED", e);
     }
 });
+</script> -->
+
+<button id="triggerBtn">CLICK ME</button>
+
+<script>
+const btn = document.getElementById("triggerBtn");
+btn.addEventListener("click", async (event) => {
+    try {
+        await navigator.clipboard.writeText("TEST-123");
+        console.log("SUCCESS: Teks berhasil dicopy!");
+    } catch (e) {
+        console.log("BLOCKED: Browser menolak akses clipboard.", e.message);
+    }
+});
+window.onload = () => {
+    console.log("Halaman dimuat, menunggu 2 detik untuk auto-click...");
+    
+    setTimeout(() => {
+        console.log("Menjalankan auto-click sekarang!");
+        btn.click(); 
+    }, 2000);
+};
 </script>
