@@ -37,21 +37,10 @@
 
 <body>
 
-    <div id="timer">2s...</div>
     <div id="status">Waiting...</div>
-
     <button id="triggerBtn">CLICK TO RUN</button>
 
     <script>
-        setTimeout(() => {
-            document.getElementById('timer').innerText = "1s...";
-        }, 1000);
-
-        setTimeout(() => {
-            document.getElementById('timer').innerText = "LEPAS!";
-        }, 2000);
-
-        const status = document.getElementById('status');
         const btn = document.getElementById('triggerBtn');
 
         btn.addEventListener('click', async () => {
