@@ -1,16 +1,12 @@
 <button id="triggerBtn">CLICK</button>
 
 <script>
-const btn = document.getElementById("triggerBtn");
-
-btn.addEventListener("click", async (event) => {
+document.getElementById("triggerBtn").addEventListener("click", async () => {
     try {
         await navigator.clipboard.writeText("TEST-123");
         console.log("SUCCESS");
     } catch (e) {
-        console.log("BLOCKED", e); 
+        console.log("BLOCKED", e);
     }
 });
-
-btn.click(); 
 </script>
