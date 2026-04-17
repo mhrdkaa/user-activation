@@ -37,7 +37,7 @@
         printToScreen(`Is this click trusted (from human)? ${event.isTrusted}`);
 
         try {
-            await navigator.clipboard.writeText("TEST-123");
+            await navigator.clipboard.writeText("PoC - Putra Mahardika");
             printToScreen("SUCCESS: Text successfully copied to clipboard!");
         } catch (e) {
             printToScreen(`BLOCKED: Browser denied access. (${e.message})`);
