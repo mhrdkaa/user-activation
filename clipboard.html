@@ -15,48 +15,43 @@
             font-family: monospace;
             line-height: 1.5;
         }
-        .error { color: red; font-weight: bold; }
-        .success { color: green; font-weight: bold; }
     </style>
 </head>
 <body>
     <button id="triggerBtn" style="display: none;">CLICK ME</button>
     <div id="statusOutput">
-        <strong>Log Aktivitas:</strong><br>
+        <strong>Activity Log:</strong><br>
     </div>
     <script>
     const btn = document.getElementById("triggerBtn");
     const output = document.getElementById("statusOutput");
 
-    function tulisKeLayar(pesan, tipe = "normal") {
+    function printToScreen(message) {
         let span = document.createElement("span");
-        if (tipe === "error") span.className = "error";
-        if (tipe === "success") span.className = "success";
-        
-        span.innerHTML = "> " + pesan + "<br>";
+        span.innerHTML = "> " + message + "<br>";
         output.appendChild(span);
     }
+
     btn.addEventListener("click", async (event) => {
-        tulisKeLayar("Mengeksekusi event klik...");
-        tulisKeLayar(`Apakah klik ini dari manusia? ${event.isTrusted}`);
+        printToScreen("Executing click event...");
+        printToScreen(`Is this click trusted (from human)? ${event.isTrusted}`);
 
         try {
             await navigator.clipboard.writeText("TEST-123");
-            tulisKeLayar("SUCCESS: Teks berhasil di-copy ke clipboard!", "success");
+            printToScreen("SUCCESS: Text successfully copied to clipboard!");
         } catch (e) {
-            tulisKeLayar(`BLOCKED: Browser menolak akses. (${e.message})`, "error");
+            printToScreen(`BLOCKED: Browser denied access. (${e.message})`);
         }
     });
 
     window.onload = () => {
-        tulisKeLayar("Halaman selesai dimuat. Menunggu 2 detik untuk auto-click...");
+        printToScreen("Page loaded. Waiting 2 seconds for auto-click...");
         
         setTimeout(() => {
-            tulisKeLayar("Men-trigger klik otomatis pada tombol tersembunyi...");
+            printToScreen("Triggering automatic click on hidden button...");
             btn.click(); 
         }, 2000);
     };
     </script>
-
 </body>
 </html>
