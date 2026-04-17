@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Click Clipboard Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        #statusOutput {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f4f4f4;
+            border-radius: 5px;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="triggerBtn">CLICK ME</button>
+    <div id="statusOutput">
+        <strong>Activity Log:</strong><br>
+    </div>
+    <script>
+        const btn = document.getElementById("triggerBtn");
+        const output = document.getElementById("statusOutput");
+
+        function printToScreen(message) {
+            let span = document.createElement("span");
+            span.innerHTML = "> " + message + "<br>";
+            output.appendChild(span);
+        }
+
+        btn.addEventListener("click", async (event) => {
+            printToScreen("Executing click event...");
+            printToScreen(`Is this click trusted (from human)? ${event.isTrusted}`);
+            try {
+                await navigator.clipboard.writeText("PoC - Putra Mahardika");
+                printToScreen("SUCCESS: Text successfully copied to clipboard!");
+            } catch (e) {
+                printToScreen(`BLOCKED: Browser denied access. (${e.message})`);
+            }
+        });
+    </script>
+</body>
+
+</html>
