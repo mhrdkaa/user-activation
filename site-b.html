@@ -1,27 +1,31 @@
-<!DOCTYPE html>
-<html>
+<h1>Nested iframe userActivation test</h1>
+<script type="text/javascript">
+    var x = `
+    <!DOCTYPE html>
+    <html>
+    <body>
+        <h3>Inner iframe (Site B)</h3>
+        <div id="result">Checking user activation...</div>
 
-<head>
-    <title>Test B</title>
-    <meta http-equiv="refresh" content="2">
-</head>
+        <script>
+            setTimeout(() => {
+                const result = document.getElementById("result");
 
-<body>
-    <h3>Site B</h3>
-    <div id="result">Checking user activation...</div>
-
-    <script>
-        const result = document.getElementById("result");
-
-        if (navigator.userActivation) {
-            result.innerHTML = `
-                isActive: ${navigator.userActivation.isActive}<br>
-                hasBeenActive: ${navigator.userActivation.hasBeenActive}
-            `;
-        } else {
-            result.innerText = "userActivation not supported";
-        }
-    </script>
-</body>
-
-</html>
+                if (navigator.userActivation) {
+                    result.innerHTML =
+                        "isActive: " + navigator.userActivation.isActive + "<br>" +
+                        "hasBeenActive: " + navigator.userActivation.hasBeenActive;
+                } else {
+                    result.innerText = "userActivation not supported";
+                }
+            }, 1500);
+        <\/script>
+    </body>
+    </html>
+    `;
+    var bs64 = btoa(x);
+    document.write(
+        '<iframe src="data:text/html;base64,' + bs64 + '" ' +
+        'width="300" height="120" style="border:1px solid #ccc;"></iframe>'
+    );
+</script>
