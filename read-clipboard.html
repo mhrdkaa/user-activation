@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Read PoC</title>
+</head>
+<body style="font-family: monospace; background: #222; color: #fff; padding: 20px;">
+    
+    <button id="stealBtn" style="padding: 10px 20px; background: red; color: white; font-weight: bold; border: none; cursor: pointer;">
+        READ CLIPBOARD DATA
+    </button>
+    
+    <div id="log" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
+
+    <script>
+        const btn = document.getElementById("stealBtn");
+        const logDiv = document.getElementById("log");
+
+        btn.addEventListener("click", async (e) => {
+            logDiv.innerHTML += `> Attempting to read clipboard... (isTrusted: ${e.isTrusted})<br>`;
+            
+            try {
+                const text = await navigator.clipboard.readText();
+                logDiv.innerHTML += `<span style="color: #0f0; font-weight: bold;">> SUCCESS: Data stolen -> "${text}"</span><br><br>`;
+            } catch (err) {
+                logDiv.innerHTML += `<span style="color: red;">> BLOCKED: ${err.name} - ${err.message}</span><br><br>`;
+            }
+        });
+    </script>
+</body>
+</html>
