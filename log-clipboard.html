@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <body style="font-family: monospace; background: #222; color: #0f0; padding: 10px; font-size: 13px;">
-    <h3>[+] Iframe Permission Enumerator</h3>
+    <h3>[+] Iframe Permission Enumerator & Read Tester</h3>
+    
+    <button id="stealBtn" style="padding: 10px; background: red; color: white; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px;">
+        [ 1-CLICK ] STEAL CLIPBOARD DATA
+    </button>
+    
     <div id="log"></div>
 
     <script>
         const logDiv = document.getElementById("log");
+        const stealBtn = document.getElementById("stealBtn");
+
         function log(msg) { logDiv.innerHTML += `> ${msg}<br>`; }
         function logSection(title) { logDiv.innerHTML += `<br><b>--- ${title} ---</b><br>`; }
 
         async function enumeratePermissions() {
-          
             logSection("1. PERMISSIONS POLICY (Atribut iframe)");
             if (document.featurePolicy) {
                 const allowed = document.featurePolicy.allowedFeatures();
@@ -20,19 +26,14 @@
                 log(`Total Allowed : ${allowed.length}`);
                 log(`Total Blocked : ${blocked.length}`);
                 
-              
                 log(`[?] clipboard-write allowed? : <span style="color: ${allowed.includes('clipboard-write') ? '#0f0' : 'red'};">${allowed.includes('clipboard-write')}</span>`);
                 log(`[?] clipboard-read allowed?  : <span style="color: ${allowed.includes('clipboard-read') ? '#0f0' : 'red'};">${allowed.includes('clipboard-read')}</span>`);
             } else {
                 log("<span style='color: yellow;'>FeaturePolicy API tidak didukung di browser ini.</span>");
             }
 
-   
             logSection("2. PERMISSIONS API STATUS (Status saat ini)");
-            const apisToTest = [
-                'clipboard-write', 'clipboard-read', 
-                'camera', 'microphone', 'geolocation'
-            ];
+            const apisToTest = ['clipboard-write', 'clipboard-read', 'camera'];
 
             for (let api of apisToTest) {
                 try {
@@ -44,12 +45,27 @@
                 }
             }
 
-           
             logSection("3. SANDBOX ENVIRONMENT");
             log(`Is Cross-Origin? : ${window.crossOriginIsolated ? 'Yes' : 'No'}`);
             log(`Origin URL     : ${window.origin}`);
+            logSection("4. EXECUTION LOG");
         }
 
+        // Event listener untuk tombol pencurian
+        stealBtn.addEventListener("click", async (e) => {
+            log(`Action: Attempting to Read Clipboard...`);
+            log(`isTrusted (Human)? ${e.isTrusted}`);
+
+            try {
+                // Mencoba membaca isi clipboard
+                const stolenText = await navigator.clipboard.readText();
+                log(`<span style='color: #0f0; font-weight: bold;'>[!!!] SUCCESS: Data Stolen -> "${stolenText}"</span>`);
+            } catch (err) {
+                log(`<span style='color: red;'>BLOCKED: ${err.name} - ${err.message}</span>`);
+            }
+        });
+
+        // Jalankan enumerator saat halaman dimuat
         window.onload = enumeratePermissions;
     </script>
 </body>
