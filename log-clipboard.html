@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<body style="font-family: monospace; background: #222; color: #0f0; padding: 10px; font-size: 13px;">
+    <h3>[+] Iframe Permission Enumerator</h3>
+    <div id="log"></div>
+
+    <script>
+        const logDiv = document.getElementById("log");
+        function log(msg) { logDiv.innerHTML += `> ${msg}<br>`; }
+        function logSection(title) { logDiv.innerHTML += `<br><b>--- ${title} ---</b><br>`; }
+
+        async function enumeratePermissions() {
+          
+            logSection("1. PERMISSIONS POLICY (Atribut iframe)");
+            if (document.featurePolicy) {
+                const allowed = document.featurePolicy.allowedFeatures();
+                const all = document.featurePolicy.features();
+                const blocked = all.filter(f => !allowed.includes(f));
+
+                log(`Total Allowed : ${allowed.length}`);
+                log(`Total Blocked : ${blocked.length}`);
+                
+              
+                log(`[?] clipboard-write allowed? : <span style="color: ${allowed.includes('clipboard-write') ? '#0f0' : 'red'};">${allowed.includes('clipboard-write')}</span>`);
+                log(`[?] clipboard-read allowed?  : <span style="color: ${allowed.includes('clipboard-read') ? '#0f0' : 'red'};">${allowed.includes('clipboard-read')}</span>`);
+            } else {
+                log("<span style='color: yellow;'>FeaturePolicy API tidak didukung di browser ini.</span>");
+            }
+
+   
+            logSection("2. PERMISSIONS API STATUS (Status saat ini)");
+            const apisToTest = [
+                'clipboard-write', 'clipboard-read', 
+                'camera', 'microphone', 'geolocation'
+            ];
+
+            for (let api of apisToTest) {
+                try {
+                    const status = await navigator.permissions.query({ name: api });
+                    let color = status.state === 'granted' ? '#0f0' : (status.state === 'denied' ? 'red' : 'yellow');
+                    log(`[${api}] status: <span style="color: ${color};">${status.state}</span>`);
+                } catch (e) {
+                    log(`[${api}] status: <span style="color: gray;">Not supported/Queried</span>`);
+                }
+            }
+
+           
+            logSection("3. SANDBOX ENVIRONMENT");
+            log(`Is Cross-Origin? : ${window.crossOriginIsolated ? 'Yes' : 'No'}`);
+            log(`Origin URL     : ${window.origin}`);
+        }
+
+        window.onload = enumeratePermissions;
+    </script>
+</body>
+</html>
