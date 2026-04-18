@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activation Debugger (Iframe)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 15px; background: #1e1e1e; color: #d4d4d4; }
+        #statusOutput {
+            margin-top: 15px;
+            padding: 15px;
+            border-left: 4px solid #007acc;
+            background: #252526;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .meta { color: #569cd6; }
+        .success { color: #4ec9b0; }
+        .warn { color: #ce9178; }
+        .danger { color: #f44747; }
+        .header { font-weight: bold; color: #dcdcdc; border-bottom: 1px solid #3e3e42; padding-bottom: 5px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">IFRAME MONITOR: Activation Tracking</div>
+    <button id="triggerBtn" style="padding: 10px; cursor: pointer;">MANUAL TRIGGER</button>
+    
+    <div id="statusOutput"><strong>[LOG START]</strong></div>
+
+    <script>
+    const btn = document.getElementById("triggerBtn");
+    const output = document.getElementById("statusOutput");
+
+    function log(message, type = '') {
+        const time = new Date().toLocaleTimeString().split(' ')[0];
+        const span = document.createElement("div");
+        span.className = type;
+        span.innerHTML = `<span class="meta">[${time}]</span> ${message}`;
+        output.appendChild(span);
+        console.log(`[${time}] ${message}`);
+    }
+
+    function checkActivationState(context) {
+        const isActive = navigator.userActivation ? navigator.userActivation.isActive : "Unsupported API";
+        const hasBeenActive = navigator.userActivation ? navigator.userActivation.hasBeenActive : "Unsupported API";
+        
+        log(`--- Context: ${context} ---`);
+        log(`Is Active (Transient): <b>${isActive}</b>`, isActive ? 'success' : 'danger');
+        log(`Has Been Active (Sticky): ${hasBeenActive}`, 'warn');
+    }
+
+    btn.addEventListener("click", (event) => {
+        log(`Event Received: click | Trusted: ${event.isTrusted}`, 'success');
+        checkActivationState("Inside Click Handler");
+        
+        if (navigator.userActivation && navigator.userActivation.isActive) {
+            log("Attempting test redirect...", "meta");
+        }
+    });
+
+    window.onload = () => {
+        log("Iframe loaded.");
+        checkActivationState("On Load");
+
+        const delay = 2000;
+        log(`Waiting ${delay}ms for setTimeout...`, "warn");
+        
+        setTimeout(() => {
+            log(`Timeout fired (${delay}ms)`);
+            checkActivationState("Inside setTimeout");
+            
+            log("Triggering btn.click() automatically...");
+            btn.click(); 
+            checkActivationState("Post programmatic click");
+        }, delay);
+    };
+    </script>
+</body>
+</html>
