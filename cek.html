@@ -1,16 +1,121 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>tested</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Click Screen Share Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        #statusOutput {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f4f4f4;
+            border-radius: 5px;
+            font-family: monospace;
+            line-height: 1.5;
+        }
+
+        video {
+            margin-top: 20px;
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 
 <body>
-    <iframe
-        src="https://user-activation.netlify.app/cek-activation.html"
-        sandbox="allow-scripts"
-        style="width:100%; height:1000px; border:1px solid #ccc; margin-top:10px;">
-    </iframe>
-</body>
 
+    <button id="triggerBtn" style="display:none;">
+        START SCREEN SHARE
+    </button>
+
+    <div id="statusOutput">
+        <strong>Activity Log:</strong><br>
+    </div>
+
+    <video id="preview" autoplay muted playsinline></video>
+
+    <script>
+        const btn = document.getElementById("triggerBtn");
+        const output = document.getElementById("statusOutput");
+        const preview = document.getElementById("preview");
+
+        function printToScreen(message) {
+            const span = document.createElement("span");
+            span.textContent = "> " + message;
+            output.appendChild(span);
+            output.appendChild(document.createElement("br"));
+        }
+
+        btn.addEventListener("click", async (event) => {
+            printToScreen("Executing click event...");
+            printToScreen(
+                `Is this click trusted (from human)? ${event.isTrusted}`
+            );
+
+            printToScreen(
+                `User activation: ${navigator.userActivation.isActive}`
+            );
+
+            try {
+                printToScreen("Calling getDisplayMedia()...");
+
+                const stream =
+                    await navigator.mediaDevices.getDisplayMedia({
+                        video: true,
+                        audio: false
+                    });
+
+                printToScreen(
+                    "SUCCESS: Screen sharing stream obtained!"
+                );
+
+                preview.srcObject = stream;
+
+                const videoTrack = stream.getVideoTracks()[0];
+
+                printToScreen(
+                    `Track: ${videoTrack.label}`
+                );
+
+                videoTrack.addEventListener("ended", () => {
+                    printToScreen("Screen sharing ended.");
+                });
+
+            } catch (e) {
+                printToScreen(
+                    `BLOCKED/FAILED: ${e.name}: ${e.message}`
+                );
+            }
+        });
+
+        window.onload = () => {
+            printToScreen("Page loaded.");
+
+            printToScreen(
+                `Initial user activation: ${navigator.userActivation.isActive}`
+            );
+
+            printToScreen(
+                `Initial hasBeenActive: ${navigator.userActivation.hasBeenActive}`
+            );
+
+            setTimeout(() => {
+                printToScreen(
+                    "Triggering automatic click on hidden button..."
+                );
+
+                btn.click();
+
+            }, 2000);
+        };
+    </script>
+
+</body>
 </html>
